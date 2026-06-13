@@ -152,9 +152,15 @@ button { font: inherit; }
 
 .roster-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(6, 124px);
+  grid-auto-flow: row;
   gap: 7px;
-  min-height: 326px;
+  height: 779px;
+  min-height: 779px;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  padding: 2px;
   align-content: start;
 }
 
@@ -273,9 +279,12 @@ button { font: inherit; }
 .tier-pips { position: absolute; left: 4px; top: 3px; color: var(--gold); font-size: 10px; letter-spacing: -1px; }
 .empty-roster {
   grid-column: 1 / -1;
+  grid-row: 1 / -1;
+  width: 100%;
+  min-width: 100%;
   display: grid;
   place-items: center;
-  min-height: 300px;
+  min-height: 100%;
   color: #717392;
   border: 2px dashed #3d3e5b;
   text-align: center;
@@ -283,16 +292,44 @@ button { font: inherit; }
   line-height: 1.7;
 }
 
+.summon-dock {
+  position: relative;
+  z-index: 2;
+  min-width: 0;
+  padding: 8px;
+  background: linear-gradient(180deg, rgba(32,33,58,.98), rgba(25,26,47,.98));
+  border: 2px solid #555779;
+  box-shadow: 4px 4px 0 rgba(8,9,18,.28);
+}
+
+.dock-heading {
+  padding: 2px 3px 8px;
+  border-bottom: 1px solid #555779;
+}
+.dock-heading span {
+  display: block;
+  color: var(--mint);
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+.dock-heading strong {
+  display: block;
+  margin-top: 3px;
+  font-size: 17px;
+}
+
 .selected-unit-panel {
   display: grid;
   grid-template-columns: 1fr 72px;
   gap: 8px;
   align-items: center;
-  min-height: 54px;
-  margin-top: 10px;
+  height: 108px;
+  min-height: 108px;
+  margin: 8px 0 0;
   padding: 7px 8px;
   background: #16172a;
   border: 2px solid #555779;
+  overflow: hidden;
 }
 .selected-unit-panel.empty { opacity: .64; }
 .selected-unit-panel small { display: block; color: var(--muted); font-size: 10px; }
@@ -390,7 +427,9 @@ button { font: inherit; }
   font-weight: 900;
 }
 .element-compass p {
-  min-height: 23px;
+  height: 44px;
+  min-height: 44px;
+  overflow-y: auto;
   margin: 7px 0;
   color: #aaa8bf;
   font-size: 10px;
@@ -432,6 +471,32 @@ button { font: inherit; }
 .summon-button small { padding-left: 8px; border-left: 2px solid rgba(55,35,20,.25); }
 .button-icon { font-size: 19px; }
 
+.summon-dock .auto-merge-panel,
+.summon-dock .element-compass {
+  margin-left: 0;
+  margin-right: 0;
+}
+.summon-dock .summon-button {
+  width: 100%;
+  margin: 12px 0 2px;
+}
+.roster-subhead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 14px 2px 7px;
+  color: var(--cyan);
+  font-size: 13px;
+  font-weight: 900;
+}
+.roster-subhead small {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 400;
+  text-align: right;
+}
+
 .tips-panel { min-height: 148px; }
 .battle-log { height: 91px; overflow: hidden; margin-top: 10px; }
 .log-line { margin: 0 0 6px; color: var(--muted); font-size: 11px; line-height: 1.45; }
@@ -460,6 +525,18 @@ button { font: inherit; }
 .enemy-counter { text-align: right; }
 .enemy-counter span { display: block; color: var(--muted); font-size: 11px; }
 .enemy-counter b { color: var(--red); font-size: 18px; }
+
+.battle-workspace {
+  display: grid;
+  grid-template-columns: clamp(225px, 30%, 285px) minmax(0, 560px);
+  justify-content: center;
+  align-items: start;
+  gap: 12px;
+}
+.battle-summon-dock {
+  align-self: stretch;
+  min-height: 100%;
+}
 
 .canvas-wrap {
   position: relative;
@@ -952,12 +1029,61 @@ html, body { font-size: 16px; }
   width: 54px;
   height: 54px;
 }
-.roster-grid { min-height: 370px; }
+.roster-grid { height: 779px; min-height: 779px; }
+.roster-grid:has(.empty-roster) { display: block; }
+.roster-grid:has(.empty-roster) .empty-roster { height: 100%; }
 .recipe-tooltip { width: 360px; }
 .canvas-wrap { max-width: 560px; }
+.battle-summon-dock .dock-heading {
+  padding-bottom: 6px;
+}
+.battle-summon-dock .dock-heading span { font-size: 10px; }
+.battle-summon-dock .dock-heading strong { font-size: 16px; }
+.battle-summon-dock .selected-unit-panel {
+  height: 96px;
+  min-height: 96px;
+}
+.battle-summon-dock .auto-merge-panel {
+  margin-top: 6px;
+  padding: 6px;
+}
+.battle-summon-dock .auto-merge-head {
+  margin-bottom: 5px;
+  font-size: 12px;
+}
+.battle-summon-dock .auto-merge-head small { display: none; }
+.battle-summon-dock .auto-merge-button {
+  min-height: 50px;
+  padding: 4px 2px;
+}
+.battle-summon-dock .auto-merge-button b { font-size: 12px; }
+.battle-summon-dock .auto-merge-button small { font-size: 10px; }
+.battle-summon-dock .element-compass {
+  margin-top: 6px;
+  padding: 7px;
+}
+.battle-summon-dock .element-compass-head small { font-size: 10px; }
+.battle-summon-dock .element-targets button {
+  min-height: 28px;
+  font-size: 11px;
+}
+.battle-summon-dock .element-compass p {
+  height: 38px;
+  min-height: 38px;
+  font-size: 11px;
+}
+.battle-summon-dock .compass-button {
+  min-height: 34px;
+  font-size: 11px;
+}
+.battle-summon-dock .summon-button {
+  min-height: 46px;
+  margin-top: 8px;
+  font-size: 14px;
+}
 
 @media (max-width: 1500px) {
-  .layout { grid-template-columns: 380px minmax(470px, 1fr); }
+  .layout { grid-template-columns: 350px minmax(520px, 1fr); }
   .right-column { grid-column: 1 / -1; grid-template-columns: 1fr 1fr; }
   .codex-list { height: 240px; }
 }
@@ -984,9 +1110,21 @@ html, body { font-size: 16px; }
   .center-column { order: 1; width: 100%; }
   .left-column { order: 2; width: 100%; grid-template-columns: 1fr; }
   .right-column { order: 3; width: 100%; grid-template-columns: 1fr; }
-  .roster-grid { grid-template-columns: repeat(6, 1fr); min-height: 210px; }
-  .unit-card { height: 96px; }
-  .empty-roster { min-height: 180px; }
+  .battle-workspace {
+    grid-template-columns: minmax(235px, 42%) minmax(0, 1fr);
+    gap: 9px;
+  }
+  .battle-summon-dock {
+    padding: 6px;
+  }
+  .roster-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(6, 124px);
+    height: 779px;
+    min-height: 779px;
+  }
+  .unit-card { height: 124px; }
+  .empty-roster { min-height: 100%; }
 }
 
 @media (max-width: 590px) {
@@ -995,8 +1133,16 @@ html, body { font-size: 16px; }
   .topbar { grid-template-columns: 1fr; }
   .speed-controls { position: absolute; right: 9px; top: 9px; }
   .hud { grid-row: auto; grid-template-columns: repeat(2, 1fr); }
-  .roster-grid { grid-template-columns: repeat(3, 1fr); }
+  .roster-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(6, 124px);
+    height: 779px;
+    min-height: 779px;
+  }
   .battle-frame { padding: 7px; }
+  .battle-workspace { grid-template-columns: 1fr; }
+  .battle-summon-dock { order: 2; }
+  .canvas-wrap { order: 1; }
   .battle-head strong { font-size: 13px; }
   .announcement strong { font-size: 13px; }
   .difficulty-card { padding: 18px 12px; }

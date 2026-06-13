@@ -41,58 +41,12 @@
             </div>
             <span id="unitCount" class="capacity">0 / 18</span>
           </div>
-          <p class="panel-help">카드를 선택한 뒤 중앙의 빈 칸을 눌러 배치하세요.</p>
+          <p class="panel-help">보유 수호자는 3열 × 6행, 최대 18칸으로 정리됩니다.</p>
+          <div class="roster-subhead">
+            <span>보유 수호자</span>
+            <small>3 × 6 대기실 · 카드를 선택해 배치</small>
+          </div>
           <div id="roster" class="roster-grid"></div>
-          <div id="selectedUnitPanel" class="selected-unit-panel empty">
-            <div id="selectedUnitInfo">
-              <small>선택 정보</small>
-              <strong>판매하거나 배치할 캐릭터를 선택하세요</strong>
-            </div>
-            <button id="sellBtn" class="sell-button" disabled>판매</button>
-          </div>
-          <div class="auto-merge-panel">
-            <div class="auto-merge-head">
-              <span>대기실 자동조합</span>
-              <small>배치·엘리트·제단 제외</small>
-            </div>
-            <div class="auto-merge-buttons">
-              <button id="autoSameBtn" class="auto-merge-button">
-                <b>같은 것 우선</b>
-                <small>동일 캐릭터끼리</small>
-              </button>
-              <button id="autoRandomBtn" class="auto-merge-button random">
-                <b>랜덤 연쇄</b>
-                <small>서로 다른 조합식</small>
-              </button>
-            </div>
-          </div>
-          <div class="element-compass">
-            <div class="element-compass-head">
-              <span>원소 나침반</span>
-              <small>목표 2단계 조합의 부족한 재료 추적</small>
-            </div>
-            <div id="elementTargets" class="element-targets">
-              <button data-element="fire">화염</button>
-              <button data-element="frost">서리</button>
-              <button data-element="spark">번개</button>
-              <button data-element="nature">자연</button>
-              <button data-element="earth">대지</button>
-              <button data-element="solar">태양</button>
-              <button data-element="lunar">월광</button>
-              <button class="active" data-element="arcane">비전</button>
-              <button data-element="void">공허</button>
-            </div>
-            <p id="compassHint">비전 조합에 필요한 기본 유닛을 현재 보유 상태에 맞춰 찾습니다.</p>
-            <button id="guidedSummonBtn" class="compass-button">
-              <span>비전 재료 추적</span>
-              <small><b id="guidedSummonCost">30</b> 룬</small>
-            </button>
-          </div>
-          <button id="summonBtn" class="primary-button summon-button">
-            <span class="button-icon">✦</span>
-            <span>랜덤 소환</span>
-            <small><b id="summonCost">18</b> 룬</small>
-          </button>
         </section>
 
         <section class="pixel-panel tips-panel">
@@ -115,13 +69,71 @@
               <b id="enemyCount">0</b>
             </div>
           </div>
-          <div class="canvas-wrap">
-            <canvas id="gameCanvas" width="720" height="720" aria-label="룬 루프 디펜스 전장"></canvas>
-            <div id="announcement" class="announcement hidden">
-              <strong></strong>
-              <span></span>
+          <div class="battle-workspace">
+            <aside class="summon-dock battle-summon-dock" aria-label="소환 제어창">
+              <div class="dock-heading">
+                <span>SUMMON CONTROL</span>
+                <strong>소환 제어창</strong>
+              </div>
+              <div id="selectedUnitPanel" class="selected-unit-panel empty">
+                <div id="selectedUnitInfo">
+                  <small>선택 정보</small>
+                  <strong>판매하거나 배치할 캐릭터를 선택하세요</strong>
+                </div>
+                <button id="sellBtn" class="sell-button" disabled>판매</button>
+              </div>
+              <div class="auto-merge-panel">
+                <div class="auto-merge-head">
+                  <span>대기실 자동조합</span>
+                  <small>배치·엘리트·제단 제외</small>
+                </div>
+                <div class="auto-merge-buttons">
+                  <button id="autoSameBtn" class="auto-merge-button">
+                    <b>같은 것 우선</b>
+                    <small>동일 캐릭터끼리</small>
+                  </button>
+                  <button id="autoRandomBtn" class="auto-merge-button random">
+                    <b>랜덤 연쇄</b>
+                    <small>서로 다른 조합식</small>
+                  </button>
+                </div>
+              </div>
+              <div class="element-compass">
+                <div class="element-compass-head">
+                  <span>원소 나침반</span>
+                  <small>부족한 재료 추적</small>
+                </div>
+                <div id="elementTargets" class="element-targets">
+                  <button data-element="fire">화염</button>
+                  <button data-element="frost">서리</button>
+                  <button data-element="spark">번개</button>
+                  <button data-element="nature">자연</button>
+                  <button data-element="earth">대지</button>
+                  <button data-element="solar">태양</button>
+                  <button data-element="lunar">월광</button>
+                  <button class="active" data-element="arcane">비전</button>
+                  <button data-element="void">공허</button>
+                </div>
+                <p id="compassHint">비전 조합에 필요한 기본 유닛을 현재 보유 상태에 맞춰 찾습니다.</p>
+                <button id="guidedSummonBtn" class="compass-button">
+                  <span>비전 재료 추적</span>
+                  <small><b id="guidedSummonCost">30</b> 룬</small>
+                </button>
+              </div>
+              <button id="summonBtn" class="primary-button summon-button">
+                <span class="button-icon">✦</span>
+                <span>랜덤 소환</span>
+                <small><b id="summonCost">18</b> 룬</small>
+              </button>
+            </aside>
+            <div class="canvas-wrap">
+              <canvas id="gameCanvas" width="720" height="720" aria-label="룬 루프 디펜스 전장"></canvas>
+              <div id="announcement" class="announcement hidden">
+                <strong></strong>
+                <span></span>
+              </div>
+              <button id="startBtn" class="start-button">첫 라운드 시작</button>
             </div>
-            <button id="startBtn" class="start-button">첫 라운드 시작</button>
           </div>
           <div class="boss-track">
             <span>보스 경보</span>

@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>룬 루프 디펜스</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="scanlines"></div>
+  <main class="game-shell">
+    <header class="topbar pixel-panel">
+      <div class="brand">
+        <span class="brand-mark">◆</span>
+        <div>
+          <h1>룬 루프 디펜스</h1>
+          <p>소환하고, 조합하고, 사각 성채를 지켜라</p>
+        </div>
+      </div>
+      <div class="hud">
+        <div class="hud-chip"><span>ROUND</span><strong id="roundText">0 / 30</strong></div>
+        <div class="hud-chip crystal"><span>룬</span><strong id="goldText">76</strong></div>
+        <div class="hud-chip heart"><span>성벽</span><strong id="livesText">18</strong></div>
+        <div class="hud-chip"><span>처치</span><strong id="killText">0</strong></div>
+        <div class="hud-chip difficulty"><span>난이도</span><strong id="difficultyText">선택 전</strong></div>
+      </div>
+      <div class="speed-controls">
+        <button id="pauseBtn" class="icon-button" aria-label="일시 정지">Ⅱ</button>
+        <button class="speed-button active" data-speed="1">×1</button>
+        <button class="speed-button" data-speed="2">×2</button>
+      </div>
+    </header>
+
+    <section class="layout">
+      <aside class="left-column">
+        <section class="pixel-panel summon-panel">
+          <div class="panel-heading">
+            <div>
+              <span class="eyebrow">RANDOM GATE</span>
+              <h2>소환 대기실</h2>
+            </div>
+            <span id="unitCount" class="capacity">0 / 18</span>
+          </div>
+          <p class="panel-help">카드를 선택한 뒤 중앙의 빈 칸을 눌러 배치하세요.</p>
+          <div id="roster" class="roster-grid"></div>
+          <div id="selectedUnitPanel" class="selected-unit-panel empty">
+            <div id="selectedUnitInfo">
+              <small>선택 정보</small>
+              <strong>판매하거나 배치할 캐릭터를 선택하세요</strong>
+            </div>
+            <button id="sellBtn" class="sell-button" disabled>판매</button>
+          </div>
+          <div class="auto-merge-panel">
+            <div class="auto-merge-head">
+              <span>대기실 자동조합</span>
+              <small>배치·엘리트·제단 제외</small>
+            </div>
+            <div class="auto-merge-buttons">
+              <button id="autoSameBtn" class="auto-merge-button">
+                <b>같은 것 우선</b>
+                <small>동일 캐릭터끼리</small>
+              </button>
+              <button id="autoRandomBtn" class="auto-merge-button random">
+                <b>랜덤 연쇄</b>
+                <small>서로 다른 조합식</small>
+              </button>
+            </div>
+          </div>
+          <div class="element-compass">
+            <div class="element-compass-head">
+              <span>원소 나침반</span>
+              <small>목표 2단계 조합의 부족한 재료 추적</small>
+            </div>
+            <div id="elementTargets" class="element-targets">
+              <button data-element="fire">화염</button>
+              <button data-element="frost">서리</button>
+              <button data-element="spark">번개</button>
+              <button data-element="nature">자연</button>
+              <button data-element="earth">대지</button>
+              <button data-element="solar">태양</button>
+              <button data-element="lunar">월광</button>
+              <button class="active" data-element="arcane">비전</button>
+              <button data-element="void">공허</button>
+            </div>
+            <p id="compassHint">비전 조합에 필요한 기본 유닛을 현재 보유 상태에 맞춰 찾습니다.</p>
+            <button id="guidedSummonBtn" class="compass-button">
+              <span>비전 재료 추적</span>
+              <small><b id="guidedSummonCost">30</b> 룬</small>
+            </button>
+          </div>
+          <button id="summonBtn" class="primary-button summon-button">
+            <span class="button-icon">✦</span>
+            <span>랜덤 소환</span>
+            <small><b id="summonCost">18</b> 룬</small>
+          </button>
+        </section>
+
+        <section class="pixel-panel tips-panel">
+          <div class="panel-heading compact">
+            <h2>작전 기록</h2>
+          </div>
+          <div id="battleLog" class="battle-log" aria-live="polite"></div>
+        </section>
+      </aside>
+
+      <section class="center-column">
+        <section class="battle-frame pixel-panel">
+          <div class="battle-head">
+            <div>
+              <span id="waveBadge" class="wave-badge">준비 단계</span>
+              <strong id="waveTitle">첫 수호자를 소환하세요</strong>
+            </div>
+            <div class="enemy-counter">
+              <span>남은 적</span>
+              <b id="enemyCount">0</b>
+            </div>
+          </div>
+          <div class="canvas-wrap">
+            <canvas id="gameCanvas" width="720" height="720" aria-label="룬 루프 디펜스 전장"></canvas>
+            <div id="announcement" class="announcement hidden">
+              <strong></strong>
+              <span></span>
+            </div>
+            <button id="startBtn" class="start-button">첫 라운드 시작</button>
+          </div>
+          <div class="boss-track">
+            <span>보스 경보</span>
+            <div class="boss-marks">
+              <i data-boss="5">5</i><i data-boss="10">10</i><i data-boss="15">15</i><i data-boss="20">20</i><i data-boss="25">25</i><i class="final" data-boss="30">30</i>
+            </div>
+          </div>
+          <div class="threat-panel">
+            <span class="threat-title">이번 침공 정보</span>
+            <div id="threatIntel" class="threat-intel">
+              난이도를 선택하면 적 정보가 표시됩니다.
+            </div>
+          </div>
+          <div class="overcharge-panel">
+            <div>
+              <span>전술 과충전</span>
+              <small id="overchargeStatus">남는 룬을 다음 한 라운드의 화력으로 전환</small>
+            </div>
+            <button id="overchargeBtn">
+              전술 과충전 <small><b id="overchargeCost">33</b> 룬</small>
+            </button>
+          </div>
+          <div class="sequence-guide">
+            <span>공격 순서 연쇄</span>
+            <b><i class="rune frost"></i>서리 → <i class="rune spark"></i>번개 = 빙뢰</b>
+            <b><i class="rune nature"></i>자연 → <i class="rune fire"></i>화염 = 산불</b>
+            <b><i class="rune fire"></i>화염 → <i class="rune frost"></i>서리 = 열충격</b>
+            <b><i class="rune void"></i>공허 → <i class="rune solar"></i>태양 = 일식</b>
+            <b><i class="rune spark"></i>번개 → <i class="rune fire"></i>화염 = 폭전</b>
+            <b><i class="rune earth"></i>대지 → <i class="rune fire"></i>화염 = 용암파</b>
+            <b><i class="rune nature"></i>자연 → <i class="rune frost"></i>서리 = 동결뿌리</b>
+          </div>
+        </section>
+      </section>
+
+      <aside class="right-column">
+        <section class="pixel-panel merge-panel">
+          <div class="panel-heading">
+            <div>
+              <span class="eyebrow">RUNE ALTAR</span>
+              <h2>조합 제단</h2>
+            </div>
+            <button id="clearMergeBtn" class="text-button">비우기</button>
+          </div>
+          <p class="panel-help">정규 조합은 안전합니다. 1단계 재련은 두 유닛을 다른 기본 유닛 하나로 압축합니다.</p>
+          <div class="merge-row">
+            <button class="merge-slot" data-merge-slot="0"><span>재료 A</span></button>
+            <b class="merge-plus">+</b>
+            <button class="merge-slot" data-merge-slot="1"><span>재료 B</span></button>
+          </div>
+          <div id="recipeResult" class="recipe-result locked">
+            <span class="result-arrow">▼</span>
+            <div class="result-card">
+              <div class="mystery-icon">?</div>
+              <div>
+                <small>조합 결과</small>
+                <strong>재료를 선택하세요</strong>
+              </div>
+            </div>
+          </div>
+          <button id="mergeBtn" class="primary-button merge-button" disabled>
+            룬 조합 실행
+          </button>
+          <button id="reforgeBtn" class="reforge-button" title="제단의 1단계 둘을 소모하고, 두 종류를 제외한 기본 유닛 하나를 얻습니다." disabled>
+            1단계 재련 · 재료 둘과 다른 기본 유닛
+          </button>
+          <div class="merge-rule">1+1=2 · 2+2=3 · 3+3=4 · 4+4=5</div>
+        </section>
+
+        <section class="pixel-panel codex-panel">
+          <div class="panel-heading compact">
+            <div>
+              <span class="eyebrow">FORMULA ARCHIVE</span>
+              <h2>조합 도감</h2>
+            </div>
+            <span id="discoveryText" class="capacity">전체 공개</span>
+          </div>
+          <div class="tier-tabs" id="tierTabs">
+            <button class="active" data-tier="2">2단계</button>
+            <button data-tier="3">3단계</button>
+            <button data-tier="4">4단계</button>
+            <button data-tier="5">5단계</button>
+          </div>
+          <div id="codexList" class="codex-list"></div>
+        </section>
+      </aside>
+    </section>
+  </main>
+
+  <div id="recipeTooltip" class="recipe-tooltip hidden" role="tooltip"></div>
+  <div id="toastContainer" class="toast-container"></div>
+  <div id="difficultyModal" class="modal difficulty-modal">
+    <div class="difficulty-card pixel-panel">
+      <span class="eyebrow">SELECT EXPEDITION</span>
+      <h2>원정 난이도 선택</h2>
+      <p>난이도에 따라 적의 체력과 속도, 시작 자원과 성벽 내구도가 달라집니다.</p>
+      <div class="difficulty-options">
+        <button class="difficulty-option" data-difficulty="easy">
+          <span class="difficulty-icon">I</span>
+          <strong>쉬움</strong>
+          <small>성벽 26 · 시작 룬 94</small>
+          <em>입문용이지만 후반 보스는 조합을 요구합니다</em>
+        </button>
+        <button class="difficulty-option selected" data-difficulty="normal">
+          <span class="difficulty-icon">II</span>
+          <strong>보통</strong>
+          <small>성벽 18 · 시작 룬 76</small>
+          <em>시뮬레이션 권장 · 배치와 연쇄가 중요</em>
+        </button>
+        <button class="difficulty-option" data-difficulty="hard">
+          <span class="difficulty-icon">III</span>
+          <strong>어려움</strong>
+          <small>성벽 12 · 시작 룬 64</small>
+          <em>유효 조합과 엘리트 운까지 필요한 도전</em>
+        </button>
+      </div>
+      <div class="affinity-guide">
+        <b>기본 상성</b>
+        <span>화염 &gt; 자연 &gt; 대지 &gt; 번개 &gt; 서리 &gt; 화염</span>
+        <span>태양 ↔ 공허 · 비전은 보호막 관통</span>
+      </div>
+      <button id="confirmDifficultyBtn" class="primary-button">보통 난이도로 원정 시작</button>
+    </div>
+  </div>
+  <div id="easterEggModal" class="modal easter-egg-modal hidden">
+    <div class="easter-egg-card pixel-panel">
+      <span class="eyebrow">SECRET CONSTELLATION</span>
+      <div class="constellation-mark"><i></i><i></i><i></i><i></i></div>
+      <h2>사중 성좌가 깨어났다</h2>
+      <p>네 명의 5단계 수호자가 사각 성채의 봉인을 해제했습니다.</p>
+      <strong>모든 수호자 피해 +15% · 공격 속도 +10%</strong>
+      <button id="closeEasterEggBtn" class="primary-button">무한 회랑 개방</button>
+    </div>
+  </div>
+  <div id="endModal" class="modal hidden">
+    <div class="modal-card pixel-panel">
+      <span id="endEyebrow" class="eyebrow">MISSION COMPLETE</span>
+      <h2 id="endTitle">사각 성채 수호 성공!</h2>
+      <p id="endDescription"></p>
+      <div class="result-stats">
+        <div><span>도달 라운드</span><b id="resultRound">30</b></div>
+        <div><span>총 처치</span><b id="resultKills">0</b></div>
+        <div><span>완성 조합</span><b id="resultDiscoveries">0</b></div>
+      </div>
+      <button id="restartBtn" class="primary-button">새 원정 시작</button>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
